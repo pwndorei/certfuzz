@@ -119,7 +119,7 @@ class SeedfileSet(MultiArmedBandit):
         while len(self.things):
             logger.debug('Thing count: %d', len(self.things))
             # continue until we find one that exists, or else the set is empty
-            sf = MultiArmedBandit.next(self)
+            sf = MultiArmedBandit.__next__(self)
             if sf.exists():
                 # it's still there, proceed
                 return sf
