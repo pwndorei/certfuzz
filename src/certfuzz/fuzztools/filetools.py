@@ -40,7 +40,7 @@ def exponential_backoff(F):
                 logger.debug(logmsg)
             # increment naptimefor the next time around
             naptime = SLEEPTIMER * pow(BACKOFF_FACTOR, current_depth)
-        raise
+        raise Exception("exponential_backoff reached max depth")
 
     return wrapper
 
