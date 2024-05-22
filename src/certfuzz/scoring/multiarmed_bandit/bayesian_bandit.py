@@ -27,7 +27,7 @@ class BayesianMultiArmedBandit(MultiArmedBanditBase):
     def _next_key(self):
         return weighted_choice(self._scaled_scores())
 
-    def __next__(self):
+    def next(self):
         # if there aren't any arms, we're done.
         if not len(self.arms):
             raise StopIteration
