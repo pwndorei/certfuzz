@@ -20,7 +20,7 @@ def load_config(yaml_file):
     :param yaml_file: path to a yaml file containing the configuration
     '''
     with open(yaml_file, 'rb') as f:
-        cfg = yaml.load(f)
+        cfg = yaml.load(f, Loader=yaml.Loader)
 
     # yaml.load returns None if the file is empty. We need to raise an error
     if cfg is None:
