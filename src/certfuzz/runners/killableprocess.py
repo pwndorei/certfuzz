@@ -53,7 +53,7 @@ import os
 import time
 import datetime
 import types
-import exceptions
+#import exceptions
 
 try:
     from subprocess import CalledProcessError
