@@ -53,7 +53,10 @@ import os
 import time
 import datetime
 import types
+import logging
 #import exceptions
+
+logger = logging.getLogger(__name__)
 
 try:
     from subprocess import CalledProcessError
@@ -107,22 +110,47 @@ class Popen(subprocess.Popen):
     kill_called = False
     if mswindows:
         def _execute_child(self, *args_tuple):
-            # workaround for bug 958609
-            if sys.hexversion < 0x02070600:  # prior to 2.7.6
+            logger.debug(f"Popen._execute_child args: {args_tuple}")
+            # for Python3 https://github.com/python/cpython/blob/main/Lib/subprocess.py
+
+            if sys.hexversion < 0x03110000:
                 (args, executable, preexec_fn, close_fds,
-                    cwd, env, universal_newlines, startupinfo,
-                    creationflags, shell,
-                    p2cread, p2cwrite,
-                    c2pread, c2pwrite,
-                    errread, errwrite) = args_tuple
-                to_close = set()
-            else:  # 2.7.6 and later
+                pass_fds, cwd, env,
+                startupinfo, creationflags, shell,
+                p2cread, p2cwrite,
+                c2pread, c2pwrite,
+                errread, errwrite,
+                restore_signals,
+                gid, gids, uid, umask,
+                start_new_session) = args_tuple
+
+                logger.debug(
+    f"args: {args}, executable: {executable}, preexec_fn: {preexec_fn}, close_fds: {close_fds}, pass_fds: {pass_fds}, "
+    f"cwd: {cwd}, env: {env}, startupinfo: {startupinfo}, creationflags: {creationflags}, shell: {shell}, "
+    f"p2cread: {p2cread}, p2cwrite: {p2cwrite}, c2pread: {c2pread}, c2pwrite: {c2pwrite}, errread: {errread}, "
+    f"errwrite: {errwrite}, restore_signals: {restore_signals}, gid: {gid}, gids: {gids}, uid: {uid}, "
+    f"umask: {umask}, start_new_session: {start_new_session}"
+)
+
+            else:
                 (args, executable, preexec_fn, close_fds,
-                    cwd, env, universal_newlines, startupinfo,
-                    creationflags, shell, to_close,
-                    p2cread, p2cwrite,
-                    c2pread, c2pwrite,
-                    errread, errwrite) = args_tuple
+                pass_fds, cwd, env,
+                startupinfo, creationflags, shell,
+                p2cread, p2cwrite,
+                c2pread, c2pwrite,
+                errread, errwrite,
+                restore_signals,
+                gid, gids, uid, umask,
+                start_new_session, process_group) = args_tuple
+
+                logger.debug(
+    f"args: {args}, executable: {executable}, preexec_fn: {preexec_fn}, close_fds: {close_fds}, pass_fds: {pass_fds}, "
+    f"cwd: {cwd}, env: {env}, startupinfo: {startupinfo}, creationflags: {creationflags}, shell: {shell}, "
+    f"p2cread: {p2cread}, p2cwrite: {p2cwrite}, c2pread: {c2pread}, c2pwrite: {c2pwrite}, errread: {errread}, "
+    f"errwrite: {errwrite}, restore_signals: {restore_signals}, gid: {gid}, gids: {gids}, uid: {uid}, "
+    f"umask: {umask}, start_new_session: {start_new_session}, process_group: {process_group}"
+)
+
 
             if not isinstance(args, (str,)):
                 args = subprocess.list2cmdline(args)
@@ -133,7 +161,7 @@ class Popen(subprocess.Popen):
             if startupinfo is None:
                 startupinfo = winprocess.STARTUPINFO()
 
-            if None not in (p2cread, c2pwrite, errwrite):
+            if -1 not in (p2cread, c2pwrite, errwrite):
                 startupinfo.dwFlags |= winprocess.STARTF_USESTDHANDLES
 
                 startupinfo.hStdInput = int(p2cread)
@@ -181,11 +209,11 @@ class Popen(subprocess.Popen):
             winprocess.ResumeThread(int(ht))
             ht.Close()
 
-            if p2cread is not None:
+            if p2cread is not -1:
                 p2cread.Close()
-            if c2pwrite is not None:
+            if c2pwrite is not -1:
                 c2pwrite.Close()
-            if errwrite is not None:
+            if errwrite is not -1:
                 errwrite.Close()
             time.sleep(.1)
 
