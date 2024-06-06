@@ -146,6 +146,8 @@ def best_effort_move(src, dst):
         copied = best_effort_copy(src, dst)
         if copied:
             deleted = best_effort_delete(src)
+
+    logger.debug('moved %s -> %s', src, dst)
     return copied, deleted
 
 
@@ -240,6 +242,8 @@ def get_file_md5(infile):
 def write_file2(data=None, dst=None):
     logger.debug('Write to %s', dst)
     with open(dst, 'wb') as output_file:
+        if type(data) == str:
+            data = data.encode()
         output_file.write(data)
 
 
@@ -333,7 +337,7 @@ def check_zip_fh(file_like_content):
     file_like_content.seek(0)
     zipmagic = file_like_content.read(2)
     file_like_content.seek(0)
-    if zipmagic != 'PK':
+    if zipmagic != b'PK':
         # The file doesn't begin with the PK header
         return False
     else:
@@ -341,7 +345,7 @@ def check_zip_fh(file_like_content):
 
 
 def check_zip_content(content):
-    file_like_content = io.StringIO(content)
+    file_like_content = io.BytesIO(content)
     return check_zip_fh(file_like_content)
 
 

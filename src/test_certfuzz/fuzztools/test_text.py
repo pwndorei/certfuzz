@@ -84,7 +84,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expected_newpath, newpath)
         self.assertTrue(os.path.exists(expected_newpath))
 
-        with open(newpath, 'rb') as fp:
+        with open(newpath, 'r') as fp:
             content = fp.read()
             self.assertEqual('0AAAxxx1AAAxxxxx2AAAx3AAA', content)
         os.remove(newpath)

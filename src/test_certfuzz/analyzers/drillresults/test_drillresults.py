@@ -112,7 +112,7 @@ class Test(unittest.TestCase):
         self.dra._write_outfile()
         self.assertTrue(os.path.exists(f))
 
-        with open(f, 'rb') as fp:
+        with open(f, 'r') as fp:
             contents = fp.read()
             self.assertTrue('a' in contents)
             self.assertTrue('b' in contents)

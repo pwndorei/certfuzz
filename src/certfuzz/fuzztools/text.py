@@ -82,7 +82,7 @@ def _enumerate_string(content, occurences):
     byte_buffer = bytearray(content)
     for pos, count in zip(occurences, counter):
         # turn the counter into a string
-        substr = str(count)
+        substr = ord(str(count))
         nbytes = len(substr)
         # replace the original bytes with the bytes of the counter string
         for offset in range(nbytes):

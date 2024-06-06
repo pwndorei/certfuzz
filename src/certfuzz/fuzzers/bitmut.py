@@ -1,5 +1,5 @@
 from certfuzz.fuzzers.fuzzer_base import MinimizableFuzzer
-from random import jumpahead, sample, uniform, seed
+from random import sample, uniform, seed
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,8 @@ class BitMutFuzzer(MinimizableFuzzer):
         """Twiddle bits of input_file_path and write output to output_file_path"""
         # rng_seed is the based on the input file
         seed(self.rng_seed)
-        jumpahead(self.iteration)
+        # jumpahead removed
+        # https://github.com/enthought/Python-2.7.3/blob/master/Lib/random.py#L146
 
         # select a ratio of bytes to fuzz
         self.range = self.sf.rangefinder.next_item()

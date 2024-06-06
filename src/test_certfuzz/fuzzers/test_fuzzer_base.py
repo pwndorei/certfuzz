@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
             self.assertFalse(os.path.exists(f.output_file_path), f.output_file_path)
 
             # if we have output, write
-            f.output = 'abcd'
+            f.output = b'abcd'
             f.write_fuzzed()
             self.assertTrue(os.path.exists(f.output_file_path))
             self.assertEqual(os.path.getsize(f.output_file_path), len(f.output))

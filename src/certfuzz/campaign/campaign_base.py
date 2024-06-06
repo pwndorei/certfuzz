@@ -331,7 +331,7 @@ class CampaignBase(object, metaclass=abc.ABCMeta):
 
     def _read_cached_data(self, cachefile):
         try:
-            with open(cachefile, 'rb') as fp:
+            with open(cachefile, 'r') as fp:
                 cached_data = json.load(fp)
         except (IOError, ValueError) as e:
             logger.info(

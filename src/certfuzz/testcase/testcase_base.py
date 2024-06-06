@@ -209,7 +209,7 @@ class TestCaseBase(object):
         logger.info("crasher=%s bytewise_hd=%d", self.signature, self.hd_bytes)
 
     def calculate_hamming_distances_a(self):
-        with open(self.fuzzedfile.path, 'rb') as fd:
+        with open(self.fuzzedfile.path, 'r') as fd:
             fuzzed = fd.read()
 
         a_string = 'x' * len(fuzzed)

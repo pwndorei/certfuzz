@@ -17,8 +17,13 @@ def fuzz(fuzz_input=None, seed_val=None, jump_idx=None, ratio_min=0.0,
 
     if seed_val is not None:
         random.seed(seed_val)
+    
+    # jumpahead removed
+    '''
     if jump_idx is not None:
         random.jumpahead(jump_idx)
+    '''
+
 
     ratio = random.uniform(ratio_min, ratio_max)
     inputlen = len(fuzz_input)

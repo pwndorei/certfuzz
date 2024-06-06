@@ -8,6 +8,9 @@ between objects. P
 '''
 import itertools
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 from certfuzz.fuzztools.filetools import get_zipcontents
 
@@ -70,6 +73,7 @@ def bytewise_zip_hamming_distance(file1, file2):
     return _file_compare(bytewise_hd, True, file1, file2)
 
 def _file_compare(distance_function, comparezipcontents, file1, file2):
+    logger.debug(f"_file_compare: {file1} vs {file2}")
     if not comparezipcontents:
         assert os.path.getsize(file1) == os.path.getsize(file2)
 
@@ -93,8 +97,10 @@ def bitwise_hd(x, y):
 
     hd = 0
     for (a, b) in zip(x, y):
-        a = ord(a)
-        b = ord(b)
+        if type(a) is not int:
+            a = ord(a)
+        if type(b) is not int:
+            b = ord(b)
 
         v = a ^ b
         while v:

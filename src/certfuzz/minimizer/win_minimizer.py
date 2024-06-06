@@ -130,12 +130,12 @@ class WindowsMinimizer(MinimizerBase):
         if self.is_zipfile:
             self._writezip()
         else:
-            write_file(''.join(self.newfuzzed), self.tempfile)
+            write_file(b''.join(self.newfuzzed), self.tempfile)
 
             if 'copyfuzzedto' in self.cfg['target']:
                 copyfuzzedto = str(self.cfg['target'].get('copyfuzzedto', ''))
                 logger.debug("Copying fuzzed file to " + copyfuzzedto)
-                write_file(''.join(self.newfuzzed), copyfuzzedto)
+                write_file(b''.join(self.newfuzzed), copyfuzzedto)
 
             if 'postprocessfuzzed' in self.cfg['target']:
                 postprocessfuzzed = str(self.cfg['target']['postprocessfuzzed'])

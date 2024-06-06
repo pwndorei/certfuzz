@@ -26,6 +26,8 @@ from certfuzz.debuggers.output_parsers.calltracefile import Calltracefile
 from certfuzz.fuzztools.command_line_templating import get_command_args_list
 import copy
 
+import pdb
+
 logger = logging.getLogger(__name__)
 
 # if len(self.other_crashes) exceeds this number, we're
@@ -150,7 +152,7 @@ class Minimizer(object):
         self.newfuzzed_hd = 0
         self.newfuzzed_md5 = None
         self.n_misses_allowed = 0
-        self.newfuzzed = ''
+        self.newfuzzed = b''
 
         self.crash_sigs_found = {}
         self.files_tried = set()
@@ -576,6 +578,8 @@ class Minimizer(object):
         if os.path.exists(dbg.file):
             raise MinimizerError('Unable to remove temporary debug file')
 
+
+        logger.debug("is_same_crash returned")
         return newfuzzed_hash in self.crash_hashes
 
     def set_discard_chance(self):
@@ -675,6 +679,9 @@ class Minimizer(object):
             self.bytemap = hamming.bytemap(self.seed, self.fuzzed_content)
 
     def go(self):
+
+        pdb.set_trace()
+
         # start by copying the fuzzed_content file since as of now it's our
         # best fit
         filetools.copy_file(self.testcase.fuzzedfile.path, self.outputfile)
@@ -787,7 +794,9 @@ class Minimizer(object):
                 if self.is_same_crash():
                     # record the result
                     # 1. copy the tempfile
+                    logger.debug("check infinite loop1")
                     filetools.best_effort_move(self.tempfile, self.outputfile)
+                    logger.debug("check infinite loop2")
                     # 2. replace the fuzzed_content file in the crasher with
                     # the current one
                     self.testcase.fuzzedfile = BasicFile(self.outputfile)
@@ -828,6 +837,10 @@ class Minimizer(object):
                                     MAX_OTHER_CRASHES)
                         self.min_found = True
                         break
+
+                
+                logger.debug("check infinite loop1")
+            logger.debug("check infinite loop2")
 
             if not got_hit:
                 # we are self.confidence_level sure that self.target_size_guess is wrong
@@ -877,16 +890,17 @@ class Minimizer(object):
         # or that we didn't drop any bytes at all
         # so keep trying until both are true
         while not (0 < newfuzzed_hd < self.min_distance):
+            logger.debug("Possible Infinite Loop")
             newfuzzed, newfuzzed_hd = self.swap_func(
                 self.seed, self.fuzzed_content)
 
         # we know our hd is > 0 and < what it was when we started
-        self.newfuzzed = newfuzzed
+        self.newfuzzed = [chr(_).encode() for _ in newfuzzed]
         self.newfuzzed_hd = newfuzzed_hd
-        self.newfuzzed_md5 = hashlib.md5(''.join(self.newfuzzed)).hexdigest()
+        self.newfuzzed_md5 = hashlib.md5(b''.join(self.newfuzzed)).hexdigest()
 
     def revert_byte(self, offset):
-        self.newfuzzed[offset] = self.seed[offset]
+        self.newfuzzed[offset] = chr(self.seed[offset]).encode()
         self.newfuzzed_hd -= 1
 
     def bytewise_swap2(self, seed, fuzzed):
@@ -915,6 +929,7 @@ class Minimizer(object):
                     logger.error('Cannot append array element, finishing minimizer')
                     self.min_found = True
                     break
+
         return swapped, hd
         # Note that the above implementation is actually faster overall than the list
         # comprehension below since we're catching the hamming distance at the
@@ -940,4 +955,5 @@ class Minimizer(object):
                 swapped.append(newbyte)
             else:
                 swapped.append(a)
+
         return swapped, hd
